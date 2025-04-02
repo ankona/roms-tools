@@ -9,7 +9,7 @@ concurrency:
 jobs:
   build-artifacts:
     runs-on: ubuntu-latest
-    if: github.repository == 'ankona/roms-tools'
+    if: github.repository == 'ankona/rods-tools'
     steps:
       - uses: actions/checkout@v4
         with:
