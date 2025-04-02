@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/roms-tools
+      url: https://test.pypi.org/p/rods-tools
 
     permissions:
       id-token: write
