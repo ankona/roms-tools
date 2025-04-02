@@ -5,7 +5,7 @@ on:
       - published
   push:
     branches:
-      - main
+      - update-pypi-action
   pull_request:
     branches:
       - main
@@ -82,19 +82,19 @@ jobs:
         with:
           repository-url: https://test.pypi.org/legacy/
 
-  upload-to-pypi:
-    needs: test-built-dist
-    if: github.event_name == 'release'
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: releases
-          path: dist
-      - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.12.4
-        with:
-          repository-url: https://upload.pypi.org/legacy/
+  # upload-to-pypi:
+  #   needs: test-built-dist
+  #   if: github.event_name == 'release'
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   steps:
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: releases
+  #         path: dist
+  #     - name: Publish package to PyPI
+  #       uses: pypa/gh-action-pypi-publish@v1.12.4
+  #       with:
+  #         repository-url: https://upload.pypi.org/legacy/
