@@ -1,5 +1,5 @@
 [project]
-name = "roms-tools"
+name = "rods-tools"
 description = "Tools for running and analysing UCLA-ROMS simulations"
 readme = "README.md"
 authors = [

@@ -1,14 +1,6 @@
 name: Build distribution
 on:
-  release:
-    types:
-      - published
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  push # bump 00
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,7 +9,7 @@ concurrency:
 jobs:
   build-artifacts:
     runs-on: ubuntu-latest
-    if: github.repository == 'CWorthy-ocean/roms-tools'
+    if: github.repository == 'ankona/rods-tools'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,8 +54,30 @@ jobs:
       - name: Verify the built dist/wheel is valid
         run: |
           python -m pip install --upgrade pip
-          python -m pip install dist/roms_tools*.whl
+          python -m pip install dist/rods_tools*.whl
           python -c "import roms_tools; print(roms_tools.__version__)"
+
+  upload-to-test-pypi:
+    needs: test-built-dist
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/rods-tools
+
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: tags
+          path: dist
+      - name: Publish package to TestPyPI
+        uses: pypa/gh-action-pypi-publish@v1.12.4
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          verbose: true
 
   upload-to-pypi:
     needs: test-built-dist
@@ -78,6 +92,6 @@ jobs:
           name: releases
           path: dist
       - name: Publish package to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.8.10
+        uses: pypa/gh-action-pypi-publish@v1.12.4
         with:
           repository-url: https://upload.pypi.org/legacy/
