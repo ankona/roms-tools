@@ -1,6 +1,6 @@
 name: Build distribution
 on:
-  push # bump 0
+  push # bump 00
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
