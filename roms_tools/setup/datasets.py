@@ -2774,37 +2774,38 @@ def _select_relevant_times(
                     {time_dim: convert_cftime_to_datetime(ds[time_dim])}
                 )
             if end_time:
-                end_time = end_time
+                # end_time = end_time
 
-                # Identify records before or at start_time
-                before_start = ds[time_dim] <= np.datetime64(start_time)
-                if before_start.any():
-                    closest_before_start = (
-                        ds[time_dim].where(before_start, drop=True).max()
-                    )
-                else:
-                    logging.warning("No records found at or before the start_time.")
-                    closest_before_start = ds[time_dim].min()
+                # # Identify records before or at start_time
+                # before_start = ds[time_dim] <= np.datetime64(start_time)
+                # if before_start.any():
+                #     closest_before_start = (
+                #         ds[time_dim].where(before_start, drop=True).max()
+                #     )
+                # else:
+                #     logging.warning("No records found at or before the start_time.")
+                #     closest_before_start = ds[time_dim].min()
 
-                # Identify records after or at end_time
-                after_end = ds[time_dim] >= np.datetime64(end_time)
-                if after_end.any():
-                    closest_after_end = ds[time_dim].where(after_end, drop=True).min()
-                else:
-                    logging.warning("No records found at or after the end_time.")
-                    closest_after_end = ds[time_dim].max()
+                # # Identify records after or at end_time
+                # after_end = ds[time_dim] >= np.datetime64(end_time)
+                # if after_end.any():
+                #     closest_after_end = ds[time_dim].where(after_end, drop=True).min()
+                # else:
+                #     logging.warning("No records found at or after the end_time.")
+                #     closest_after_end = ds[time_dim].max()
 
                 # Select records within the time range and add the closest before/after
                 within_range = (ds[time_dim] > np.datetime64(start_time)) & (
                     ds[time_dim] < np.datetime64(end_time)
                 )
-                selected_times = ds[time_dim].where(
-                    within_range
-                    | (ds[time_dim] == closest_before_start)
-                    | (ds[time_dim] == closest_after_end),
-                    drop=True,
-                )
-                ds = ds.sel({time_dim: selected_times})
+                # selected_times = ds[time_dim].where(
+                #     within_range,
+                #     # | (ds[time_dim] == closest_before_start)
+                #     # | (ds[time_dim] == closest_after_end),
+                #     drop=True,
+                # )
+                within_range = slice(np.datetime64(start_time), np.datetime64(end_time))
+                ds = ds.sel(time=within_range)
             else:
                 # Look in time range [start_time, start_time + 24h]
                 end_time = start_time + timedelta(days=1)
