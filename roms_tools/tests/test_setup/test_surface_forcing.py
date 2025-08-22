@@ -909,10 +909,12 @@ def test_from_yaml_missing_surface_forcing(tmp_path, use_dask):
         yaml_filepath.unlink()
 
 
-@pytest.mark.stream
-def test_surface_forcing_arco(surface_forcing_arco, tmp_path):
+# @pytest.mark.stream
+@pytest.mark.arco
+def test_surface_forcing_arco(surface_forcing_arco, tmp_path, dask_tuple):
     """One big integration test for cloud-based ERA5 data because the streaming takes a
     long time."""
+    dask_client, dask_cluster = dask_tuple
 
     # Test plotting
     surface_forcing_arco.plot(var_name="uwnd", time=0)

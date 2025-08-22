@@ -519,15 +519,31 @@ def surface_forcing(use_dask):
     )
 
 
-@pytest.mark.stream
 @pytest.fixture(scope="session")
-def surface_forcing_arco(use_dask):
-    """Fixture for creating a SurfaceForcing object with ERA5 ARCO data."""
+def dask_tuple():
+    import dask_memusage
 
-    if not use_dask:
-        pytest.skip("surface_forcing_arco requires use_dask=True")
+    from dask.distributed import Client, LocalCluster
 
-    grid = Grid(
+    cluster = LocalCluster()
+    # dask_memusage.install(cluster.scheduler, "/tmp/memusage.csv")
+    # print(f"######## {cluster.scheduler.plugins}.  ####")
+
+    client = Client(cluster)
+
+    yield client, cluster
+
+    # print(cluster.scheduler.plugins)
+
+    client.shutdown()
+    cluster.close()
+
+
+@pytest.fixture(scope="session")
+def arco_grid() -> Grid:
+    """Fixture holding topography dataset for ARCO ERA5 streaming ds."""
+
+    return Grid(
         nx=5,
         ny=5,
         size_x=5,
@@ -537,11 +553,16 @@ def surface_forcing_arco(use_dask):
         rot=20,
     )
 
+
+@pytest.fixture(scope="session")
+def surface_forcing_arco(use_dask: bool, arco_grid: Grid, dask_tuple) -> SurfaceForcing:
+    """Fixture for creating a SurfaceForcing object with ERA5 ARCO data."""
+
     start_time = datetime(2020, 2, 1)
     end_time = datetime(2020, 2, 2)
 
     return SurfaceForcing(
-        grid=grid,
+        grid=arco_grid,
         start_time=start_time,
         end_time=end_time,
         source={"name": "ERA5"},
